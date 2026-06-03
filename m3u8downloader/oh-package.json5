@@ -1,0 +1,15 @@
+{
+  "name": "m3u8downloader",
+  "version": "1.0.0",
+  "description": "A HarmonyOS Next HAR library for downloading M3U8 (HLS VOD) streams, including TS segment downloading, AES-128 key support, pause/resume/delete task control, and progress callbacks.",
+  "main": "Index.ets",
+  "author": "PETKIT",
+  "license": "MIT",
+  "keywords": ["m3u8", "hls", "download", "harmonyos", "arkts"],
+  "dependencies": {
+  },
+  "devDependencies": {
+
+  },
+  "dynamicDependencies": {}
+}

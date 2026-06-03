@@ -1,0 +1,60 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/wangbinji/.ohos/config/default_M3U8DownloadDemo_fVRJ8sMHUHWfuh-j8xPUBgZXpPmVZntFLcNPgbnRlDM=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BACB306DD7040725DD7993E52BD7CEA024B33CEDF134B94E9A27090A0E393248EA2EEA5EF6ECF76",
+          "profile": "/Users/wangbinji/.ohos/config/default_M3U8DownloadDemo_fVRJ8sMHUHWfuh-j8xPUBgZXpPmVZntFLcNPgbnRlDM=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/wangbinji/.ohos/config/default_M3U8DownloadDemo_fVRJ8sMHUHWfuh-j8xPUBgZXpPmVZntFLcNPgbnRlDM=.p12",
+          "storePassword": "0000001B1532287C8717A45E575137C2F3F591F9FC8665C0A0848E3BC80233D64D0846E9A8E40C0F72D301"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "5.0.4(16)",
+        "compatibleSdkVersion": "5.0.4(16)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "m3u8downloader",
+      "srcPath": "./m3u8downloader"
+    }
+  ]
+}
