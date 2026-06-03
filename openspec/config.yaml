@@ -1,0 +1,112 @@
+schema: spec-driven
+
+# ──────────────────────────────────────────────
+# 语言
+# ──────────────────────────────────────────────
+# AI 在所有对话、artifact 输出、注释与说明中，
+# 必须始终使用简体中文。代码标识符（变量名、
+# 方法名、类名）保持英文，注释和文档用中文。
+
+# ──────────────────────────────────────────────
+# 项目上下文
+# ──────────────────────────────────────────────
+context: |
+  ## 项目概述
+  本项目是一个 HarmonyOS Next 应用，包含两个模块：
+  - `m3u8downloader`：核心下载库（HAR 包），发布到 OHPM，包名 @wangbinji/m3u8downloader
+  - `entry`：示例应用，演示库的使用方式
+
+  ## 技术栈
+  - 语言：ArkTS（HarmonyOS 专属 TypeScript 方言）
+  - UI 框架：ArkUI（@Entry @Component 装饰器体系）
+  - 构建工具：hvigor
+  - 包管理：ohpm（oh-package.json5）
+  - 系统 API：
+    - 网络请求：@kit.NetworkKit（http.createHttp）
+    - 文件操作：@kit.CoreFileKit（fileIo）
+    - 持久化：@ohos.data.preferences
+    - Socket 服务：@kit.NetworkKit（socket.TCPSocketServer）
+    - 容器：@kit.ArkTS（HashMap）
+
+  ## 库架构（m3u8downloader）
+  ```
+  M3U8Manager（公开门面，单例）
+    └── M3U8DownloadContainer（每个 URL 一个，下载编排）
+          ├── M3U8Analyser（解析 M3U8 文本，生成本地/HTTP 版本）
+          ├── M3U8Downloader（顺序下载 TS 分片和 AES key 文件）
+          └── M3U8FileManager（文件 I/O 封装）
+  M3U8LocalServer（本地 TCP HTTP 服务器，由 Manager 内部管理）
+  LogBus（日志单例，用户可注入 M3U8Logger 实现）
+  M3U8Setting（路径计算工具，含 ensureDir/buildHeaders 等静态方法）
+  M3U8Tools（URL 解析、字符串提取工具）
+  ```
+
+  ## 公开 API（Index.ets 导出）
+  - `M3U8Manager`：主入口，setup()/download()/pause()/resume()/delete()
+  - `M3U8ManagerConfig`：配置接口（context, saveFilePath, port?, defaultHeaders?, logger?）
+  - `M3U8DownloadState`：枚举（Downloading / Complete / Fail）
+  - `DownloadProgressHandler`：(progress: number, downloadedSegments: number, totalSegments: number) => void
+  - `DownloadCompleteHandler`：(state, localUrl, error?) => void
+  - `M3U8PauseCompletionHandler`：(error?) => void
+  - `M3U8Logger`：日志接口（debug/info/warn/error，参数 tag+msg）
+  - `LogBus`：日志单例，setLogger() 注入自定义实现
+
+  ## 核心业务领域
+  - M3U8/HLS VOD 流下载（不支持直播流）
+  - 支持 AES-128 加密（key 文件单独下载，自动去重）
+  - TS 分片顺序串行下载（非并发）
+  - 下载产物：oriMovie.m3u8（原始）、movie.m3u8（本地路径版）、httpMovie.m3u8（本地 HTTP 版）
+  - 文件按 md5(url) 组织目录：{saveFilePath}/m3u8files/{md5}/
+  - 本地 HTTP 服务器在 127.0.0.1:{port} 提供 TS 分片访问，供播放器使用
+
+  ## 示例 App 架构（entry）
+  - `TaskQueue`：并发控制（最多 3 个同时下载），手动触发模式
+  - `TaskStore`：基于 dataPreferences 的任务持久化
+  - `Index.ets`：任务列表页（添加/暂停/恢复/重试/删除/播放）
+  - `PlayerPage.ets`：ijkplayer 播放页
+
+  ## 编码约定
+  - 单例：`private static _instance = new Foo()` + `static get instance()`
+  - 所有 console.* 调用已替换为 `LogBus.instance.info/error/warn/debug(TAG, msg)`
+  - 目录创建统一通过 `M3U8Setting.ensureDir()` / `M3U8Setting.fullCommonDirPrefixWithUrl()`
+  - ArkTS 不支持 spread 语法复制对象，headers 复制用 Object.keys 遍历
+  - ArkTS 接口用 `export interface`，类型别名用 `export declare type`
+  - 文件命名：PascalCase.ets
+
+  ## 已归档的 Change（历史背景）
+  - add-local-playback：增加本地 HTTP server + ijkplayer 播放
+  - multi-task-download：增加 TaskQueue 并发调度、TaskStore 持久化
+  - publish-to-ohpm：ohpm 发布配置、obfuscation-rules
+  - refactor-m3u8downloader-for-publish：本次大重构（Logger 注入、Server 内化、API 清理）
+
+# ──────────────────────────────────────────────
+# 每个 artifact 的规则
+# ──────────────────────────────────────────────
+rules:
+  proposal:
+    - 用简体中文撰写所有内容
+    - Breaking change 必须用 **BREAKING** 标注
+    - "What Changes" 部分要具体到文件级别的改动
+    - Capabilities 中的名称使用 kebab-case 英文，描述用中文
+    - 篇幅控制在 1 页以内，聚焦"为什么"而非"怎么做"
+
+  design:
+    - 用简体中文撰写所有内容
+    - 每个设计决策必须说明"为什么不用方案 B"（替代方案对比）
+    - 涉及公开 API 变更时，必须写出新旧签名对比
+    - ArkTS 限制（不支持 spread、不支持某些泛型用法等）需在 Context 中提前说明
+    - Risks 部分格式：[风险描述] → 缓解措施
+
+  specs:
+    - 用简体中文撰写所有内容（capability 名称保持英文 kebab-case）
+    - 每个 Requirement 至少包含 2 个 Scenario
+    - Scenario 必须用 WHEN/THEN 格式，描述可测试的行为
+    - 不在 spec 中描述实现细节（类名、方法名）
+    - 涉及公开 API 的 spec 需说明消费方视角的使用方式
+
+  tasks:
+    - 用简体中文撰写所有内容
+    - 每个任务粒度：单个开发者在一次专注工作中可完成
+    - 任务描述精确到文件名和方法名级别
+    - 有依赖关系的任务必须按顺序编号（先决条件的 group 编号更小）
+    - 库代码（m3u8downloader/）的任务早于示例 App（entry/）的任务

@@ -1,0 +1,13 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@wangbinji/m3u8downloader": "file:../m3u8downloader",
+    "@ohos/ijkplayer": "^2.0.7"
+  }
+}
+

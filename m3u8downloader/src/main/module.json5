@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "m3u8downloader",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ]
+  }
+}
